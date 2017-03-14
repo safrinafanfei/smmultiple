@@ -1,0 +1,316 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>Ask Metafilter Small Multiples</title>
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <script src="js/libs/modernizr-2.0.6.min.js"></script>
+
+</head>
+<style>
+
+.container {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+h1 {
+  font-size: 26px;
+  padding: 0px 0 5px 0;
+  line-height: 1.2em;
+  color: #000;
+  margin-bottom: 0px;
+/*  text-align: center;
+*/}
+
+#lead {
+  clear: both;
+  width: 600px;
+}
+
+#lead p {
+  color: #444;
+  font-family: Georgia,Palatino,serif;
+  font-size: 1.0em;
+  line-height: 1.4em;
+/*  margin-right: auto;
+  margin-left:auto;*/
+}
+
+.chart {
+  float: left;
+  padding-right: 5px;
+  padding-bottom: 5px;
+  padding-top:0;
+  padding-left:0;
+}
+
+svg {
+  font-size: 10px;
+  fill:white;
+
+}
+
+.background {
+  fill: none;
+}
+
+.area {
+  fill: #cec6b9;
+}
+
+.line {
+  fill: none;
+  stroke: #74736c;
+  stroke-width: 1.4px;
+}
+
+.title {
+  font-size: 12px;
+}
+
+.axis line, .grid line {
+  stroke-width: .5px;
+  shape-rendering: crispEdges;
+  stroke: #fff;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.axis path {
+  display: none;
+}
+
+.hidden {
+  display:none;
+  opacity: 0.0;
+}
+
+#button-wrap {
+  width: 220px;
+  margin-left: auto;
+  margin-right: auto;
+  height: 40px;
+  margin-bottom: 10px;
+  padding-left: 5px;
+}
+
+.button {
+  cursor: pointer;
+  float: left;
+  width: 100px;
+  height: 30px;
+  text-align: center;
+  background: #fcfcfc;
+  border: 1px solid #cecece;
+  display: block;
+  padding-top: 5px;
+  margin-top: 10px;
+  border-radius: 5px 5px 5px 5px;
+}
+
+.button.active {
+  box-shadow: inset 0px 0px 7px rgba(0,0,0,0.18);
+  pointer-events: none;
+  background-color: #e6e6e6;
+}
+
+#count {
+  border-radius: 5px 0px 0px 5px;
+}
+
+#name {
+  border-radius: 0px 5px 5px 0px;
+}
+
+.bar{
+	fill:#E6B85B;
+}
+
+.bar1{
+	fill:#7377B3;
+}
+
+/*.tick text{
+	color:black;
+}*/
+
+</style>
+
+<body>
+
+  <div class="container">
+    <h1>Immunization</h1>
+    <div id="lead">
+      <p>Metafilter's revenue has been on the decline, but has its content dried up as well?</p>
+      <p>Here we look at new posts on Ask Metafilter by category.<br/>Categories like <strong>computers &amp; internet</strong> have been dropping in use for a long time, most likely due to competition like Stack Overflow.<br/>Other smaller categories have had consistent use patterns until more recently.</p>
+      <p>Disclaimer: 2014 is included, even though the year is not over yet.</p>
+    </div>
+    <div id="main">
+      <div id="button-wrap">
+        <div id="count" class="button active">COUNT</div>
+        <div id="name" class="button">NAME</div>
+      </div>
+      
+      <div id="vis"></div>
+    </div>
+  </div> <!--! end of #container -->
+
+
+  <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script> -->
+  <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
+
+
+  <script src="js/libs/d3.js"></script>
+  <script src="js/libs/queue.min.js"></script>
+   <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.min.js"></script>
+
+  <script type="text/javascript">
+// queue()
+// 	.defer(d3.csv,"data/mcv1-xlsx.csv")
+// 	.await(makeBarchart)
+
+var width = 150, height = 120, margin = {top: 15, right: 10, bottom: 40, left: 35}
+
+var formatPercent = d3.format(".0%");
+
+var x = d3.scale.ordinal()
+	.rangeRoundBands([0,width], .1);
+
+var y = d3.scale.linear()
+    .range([height/2, 0]); 
+
+var y2 = d3.scale.linear()
+    .range([height/2, 0]);  
+
+var xAxis = d3.svg.axis()
+	.scale(x)
+	.orient("bottom")
+	// .tickValues(x.domain().filter(function(d,i){return !(i%3);}))
+
+var yAxis = d3.svg.axis()
+	.scale(y)
+	.orient("left")
+	.tickFormat(formatPercent);
+
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<strong>" + d.cname + "\t" + d.year + "</strong><br/><span style='color:#fff'>" + d.coverage + "%</span>";
+  })
+
+
+
+
+d3.csv("data/mcv1-xlsx.csv", function(error, data){
+	// var format = d3.time.format("%Y")
+	data.sort(function(a,b){
+  		return a.year - b.year;
+	});
+
+	data.forEach(function(d){
+		d.year = d.year;
+		d.coverage = +d.coverage;
+		d.cname = d.cname;
+		d.case = +d.case;
+	})
+
+
+
+	var nests = d3.nest()
+			.key(function(d){return d.cname;})
+			.entries(data);
+
+	nests.forEach(function(n){
+		n.maxCase = d3.max(n.values, function(d){return d.case;})
+		console.log(n.maxCase);
+	});
+
+	x.domain(data.map(function(d){return d.year;}));
+    y.domain([0, d3.max(nests, function(s) { return s.values[0].coverage; })]);
+
+	var svg = d3.select(".container").selectAll("svg")
+			.data(nests)
+		.enter().append("div").attr("class", "chart")
+			.append("svg").append("g")
+			.attr("width", width + margin.left + margin.right)
+			.attr("height", height + margin.top + margin.bottom);
+
+	var g = svg.select("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+	svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + (height/2 -7) + ")")
+      .call(xAxis);
+
+ 
+ 
+
+    svg.selectAll(".bar")
+      .data(function(d) {return d.values;})
+      .enter()
+      .append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.year); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.coverage); })
+      .attr("height", function(d) { return height/2 - y(d.coverage); })
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide)
+
+  	svg.call(tip);
+
+  	svg.selectAll(".bar1")
+      .data(function(d) {return d.values;})
+      .enter()
+      .append("rect")
+      .attr("class", "bar1")
+      .attr("x", function(d) { return x(d.year); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return height/2 +10; })
+      .attr("height", function(d) {y2.domain([0,d.maxCase]); return height/2- y2(d.case); })
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide)
+
+
+    
+
+
+
+
+    svg.append("text")
+      .attr("x", width - 6)
+      .attr("y", height - 6)
+      .style("text-anchor", "end")
+      .text(function(d) { return d.key; });
+
+
+});
+
+  </script>
+
+
+  
+
+
+  <!--[if lt IE 7 ]>
+    <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+    <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+  <![endif]-->
+  
+</body>
+</html>

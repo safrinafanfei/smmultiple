@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<style>
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #eee;
+    shape-rendering: crispEdges;
+}
+ 
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+ 
+
+ 
+.circle {
+    fill: rgba(180, 89, 140,0.5);
+}
+</style>
+<body>
+<div id="punchcard"></div>
+</body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/d3-time.v1.min.js"></script>
+<script src="https://d3js.org/d3-time-format.v2.min.js"></script>
+<script>
+var w = 300, h = 400, pad = 50, left_pad = 20, data_url = '/data.json'
+var svg = d3.select('#punchcard')
+		.append('svg')
+		.attr('width', w)
+		.attr('height',h);
+
+
+d3.csv('usdatatest-xlsx.csv', function (error, data){
+
+var parseDate = d3.time.format("%Y").parse;
+
+var formatDate = d3.time.format("%y");
+
+	data.forEach(function(d){
+		d.type = d.type;
+		d.a = d.a; 
+		d.b = + d.b;
+		// console.log(formatDate(d.a));	
+	})
+
+	var yearFilter = function(d,i){
+		return !(i%2)
+	}
+	// console.log(function(d){return d.type});
+	var x = d3.scale.ordinal().domain(data.map(function(d){return d.a;})).rangePoints([left_pad, w-pad]),
+	y = d3.scale.ordinal().domain(data.map(function(d){return d.type;})).rangePoints([pad, h-pad*2]);
+
+
+	
+
+	var xAxis = d3.svg.axis().scale(x).orient("top")
+			.tickValues(x.domain().filter(function(d,i){return !(i%4);}))
+
+        
+
+	yAxis = d3.svg.axis().scale(y).orient("right")
+		.ticks(7);
+        
+
+    svg.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(0, "+(pad)+")")
+    .call(xAxis);
+ 
+	svg.append("g")
+	    .attr("class", "axis")
+	    .attr("transform", "translate("+(w-pad)+", 0)")
+	    .call(yAxis);
+
+	var max_r = d3.max(data.map(function(d){return d.b;})),
+
+	r = d3.scale.linear()
+		.domain([0, max_r])
+		.range([0,8]);
+
+	svg.selectAll("circle")
+		.data(data)
+		.enter()
+		.append("circle")
+		.attr("class","circle")
+		.attr("cx", function(d){return x(d.a);})
+		.attr("cy", function(d){return y(d.type);})
+		.attr("r",function(d){return r(d.b);});
+
+
+
+
+})
+
+
+
+
+</script>
+</html>
