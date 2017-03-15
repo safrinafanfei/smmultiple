@@ -60,7 +60,7 @@ var formatDate = d3.time.format("%y");
 	
 
 	var xAxis = d3.svg.axis().scale(x).orient("top")
-			.tickValues(x.domain().filter(function(d,i){return !(i%4);}))
+			.tickValues(x.domain().filter(function(d,i){return !(i%4);}));
 
         
 

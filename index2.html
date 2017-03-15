@@ -59,7 +59,9 @@ h1 {
 
 svg {
   font-size: 10px;
-  fill:white;
+  fill:black;
+  background-color: white;
+
 
 }
 
@@ -182,7 +184,7 @@ svg {
 // 	.defer(d3.csv,"data/mcv1-xlsx.csv")
 // 	.await(makeBarchart)
 
-var width = 150, height = 120, margin = {top: 15, right: 10, bottom: 40, left: 35}
+var width = 250, height = 120, margin = {top: 15, right: 10, bottom: 40, left: 35}
 
 var formatPercent = d3.format(".0%");
 
@@ -198,7 +200,7 @@ var y2 = d3.scale.linear()
 var xAxis = d3.svg.axis()
 	.scale(x)
 	.orient("bottom")
-	// .tickValues(x.domain().filter(function(d,i){return !(i%3);}))
+	
 
 var yAxis = d3.svg.axis()
 	.scale(y)
@@ -209,37 +211,54 @@ var tip = d3.tip()
   .attr('class', 'd3-tip')
   .offset([-10, 0])
   .html(function(d) {
-    return "<strong>" + d.cname + "\t" + d.year + "</strong><br/><span style='color:#fff'>" + d.coverage + "%</span>";
+    return "<strong>" + d.cname + "\t" + d.year + "</strong><br/><span style='color:black'>" + d.coverage + "%</span>";
+  })
+
+var tip2 = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<strong>" + d.cname + "\t" + d.year + "</strong><br/><span style='color:black'>" + d.case + "%</span>";
   })
 
 
 
 
 d3.csv("data/mcv1-xlsx.csv", function(error, data){
-	// var format = d3.time.format("%Y")
+	var format = d3.time.format("%Y");
+	var format2 = d3.time.format("%y");
 	data.sort(function(a,b){
   		return a.year - b.year;
 	});
 
 	data.forEach(function(d){
-		d.year = d.year;
+		d.year = format2(format.parse(d.year));
 		d.coverage = +d.coverage;
 		d.cname = d.cname;
-		d.case = +d.case;
-	})
-
-
+		if (!d.case || isNaN(d.case)){
+			d.case = 1000;
+		}else{
+			d.case = +d.case;
+		} 
+	});
 
 	var nests = d3.nest()
 			.key(function(d){return d.cname;})
 			.entries(data);
 
+	console.log(nests);
+
 	nests.forEach(function(n){
 		n.maxCase = d3.max(n.values, function(d){return d.case;})
-		console.log(n.maxCase);
+		n.values.forEach(function(d){
+			d.maxCase = n.maxCase;
+		});// console.log(n.maxCase);
 	});
 
 	x.domain(data.map(function(d){return d.year;}));
+
+	xAxis = xAxis.tickValues(x.domain().filter(function(d,i){return !(i%2);}));
+
     y.domain([0, d3.max(nests, function(s) { return s.values[0].coverage; })]);
 
 	var svg = d3.select(".container").selectAll("svg")
@@ -256,9 +275,6 @@ d3.csv("data/mcv1-xlsx.csv", function(error, data){
       .attr("class", "x axis")
       .attr("transform", "translate(0," + (height/2 -7) + ")")
       .call(xAxis);
-
- 
- 
 
     svg.selectAll(".bar")
       .data(function(d) {return d.values;})
@@ -282,14 +298,14 @@ d3.csv("data/mcv1-xlsx.csv", function(error, data){
       .attr("x", function(d) { return x(d.year); })
       .attr("width", x.rangeBand())
       .attr("y", function(d) { return height/2 +10; })
-      .attr("height", function(d) {y2.domain([0,d.maxCase]); return height/2- y2(d.case); })
-      .on('mouseover', tip.show)
-      .on('mouseout', tip.hide)
+      .attr("height", function(d) {
+      	y2.domain([0,d.maxCase]); 
+      	return height/2- y2(d.case);
+      	})
+      .on('mouseover', tip2.show)
+      .on('mouseout', tip2.hide)
 
-
-    
-
-
+      svg.call(tip2);
 
 
     svg.append("text")
