@@ -105,25 +105,51 @@ label {
     .highlight{
     	fill:#eee !important;
     }
-
-    .x.axis text{
+    .y.axis text{
     	display: none;
     } 
+
+    .tx_highlight{
+    	background-color: #0661A2;
+    	color:white;
+    	border-radius: 3px;
+    	padding:2px;
+    	margin: 2px;
+    }
+
+    .bar{
+        box-shadow: 0em 2em 3em #fff;
+
+    }
+
+    .grid .tick {
+	    stroke: lightgrey;
+	    stroke-opacity: 0.7;
+	    shape-rendering: crispEdges;
+	    stroke-dasharray: 2;
+	}
+
+	.grid path {
+	    stroke-width: 0;
+	}
 
 </style>
 <body>
 <div id="sections">
     <section class="section step" id="section1">
-      <div class="chart-hed">TKTKTKTK</div>
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua. 
-    </section>
-    <section class="section step" id="section2">
-      <div class="chart-hed">TKTKTKTK</div>
+      <h1>How much do hospitals charge?</h1>
       Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
       tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
       quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-      consequat. 
+      consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+      cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+      proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    </section>
+    <section class="section step" id="section2">
+      <div class="chart-hed">TKTKTKTK</div>
+      On average, the most expensive hospital charges <span class="tx_highlight">3 times </span> more than an average hospital on a single procedure. 
+      While you can save more than <span class="tx_highlight">12 times</span> if you are treated in the least costly hospital. 
+      <div class="avg-cht"></div>
     </section>
     <section class="section step" id="section3">
       <div class="chart-hed">TKTKTKTK</div>
@@ -161,9 +187,9 @@ label {
 <script>
 function Graph(){
 	function drawChart(){
-		var margin = {top: 20, right:20, bottom:30, left:80},
-		width = $('body').width() *1,
-		height = window.innerHeight * 0.9;
+		var margin = {top: 10, right:20, bottom:30, left:0},
+		width = window.innerWidth *0.9,
+		height = window.innerHeight;
 
 		var z = d3.fisheye.ordinal().rangeRoundBands([0, width - margin.right - margin.left]).distortion(0.9);
 
@@ -171,11 +197,11 @@ function Graph(){
 		var color = d3.scale.ordinal()
 			.range(["#A66F00", "#D78F00","#FFAA00","#FFBB33","#FFD685"])
 
-		var x = d3.scale.ordinal()
-			.rangeRoundBands([0,width],0,0);
+		var x = d3.scale.linear()
+			.range([0,width]);
 
-		var y = d3.scale.linear()
-			.range([height,0]);
+		var y = d3.scale.ordinal()
+			.rangeRoundBands([height, 0], .1)
 
 		var xAxis = d3.svg.axis()
 			.scale(x)
@@ -185,7 +211,7 @@ function Graph(){
 			.scale(y)
 			.orient("left")
 		    .outerTickSize(0)
-		    .tickPadding(10);
+		    .tickPadding(1);
 
 		var svg = d3.select("#graphic").append("svg")
 			.attr("width",width + margin.left + margin.right)
@@ -203,8 +229,8 @@ function Graph(){
 				d.charges_avg = +d.charges_avg;
 			})
 
-			x.domain(data.sort(function(a,b){return d3.descending(a.charges_max, b.charges_max);}).map(function(d){return d.DRG;}))
-			y.domain([0, d3.max(data, function(d){return d.charges_max;})])
+			y.domain(data.sort(function(a,b){return d3.ascending(a.charges_max, b.charges_max);}).map(function(d){return d.DRG;}))
+			x.domain([0, d3.max(data, function(d){return d.charges_max;})])
 
 			svg.append("g")
 				.attr("class","x axis")
@@ -212,9 +238,9 @@ function Graph(){
 				.call(xAxis)
 				.selectAll("text")
 			    .attr("y", 0)
-			    .attr("x", 9)
+			    // .attr("x", 9)
 			    .attr("dy", ".35em")
-			    .attr("transform", "rotate(90)")
+			    // .attr("transform", "rotate(90)")
 			    .style("text-anchor", "start");
 
 			svg.append("g")
@@ -225,7 +251,6 @@ function Graph(){
 			      .attr("y", 6)
 			      .attr("dy", ".71em")
 			      .style("text-anchor", "end")
-			      .text("charges");
 
 			var tip = d3.tip()
 			.attr('class',"d3-tip")
@@ -241,15 +266,10 @@ function Graph(){
 		      .data(data)
 		    .enter().append("rect")
 		      .attr("class", "bar")
-		      .attr("x", function(d) { return x(d.DRG); })
-		      .attr("width", x.rangeBand())
-		      .attr("y", height)
-		      .attr("height",0)
-
-		      bars.transition()
-		      .delay(function(d,i){return i *7})
-		      .attr("y", function(d) { return y(d.charges_max); })
-		      .attr("height", function(d) { return  height - y(d.charges_max - d.charges_min)})
+		      .attr("y", function(d) { return y(d.DRG); })
+		      .attr("height", y.rangeBand())
+		      .attr("x", function(d) { return x(d.charges_min); })
+		      .attr("width", function(d) { return  x(d.charges_max-d.charges_min)})
 		      .style("fill", function(d,i){
 		      	      	if(d.charges_max/d.charges_min >=20){
 		      	      		return color(0);
@@ -262,7 +282,9 @@ function Graph(){
 		      	      	}else{
 		      	      		return color(4)
 		      	      	}
-		      })
+		      		})
+		      
+		      // .style("filter", "url(#drop-shadow)")
 
 		      bars.on("mouseover",function(d,i){
 			      	tip.show(d,i);
@@ -280,25 +302,105 @@ function Graph(){
 				.data(data)
 				.enter().append("line")
 				.attr("class","avg_line")
-				.attr("x1",function(d){return x(d.DRG)})
-				.attr("y1", height)
-				.attr("x2",function(d){return x(d.DRG) +x.rangeBand();})
-				.attr("y2", height)
+				.attr("y1",function(d){return y(d.DRG)})
+				.attr("x1", 0)
+				.attr("y2",function(d){return y(d.DRG) +y.rangeBand();})
+				.attr("x2", 0)
 				.transition()
 			    .delay(function(d,i){return i *7})
-				.attr("x1",function(d){return x(d.DRG)})
-				.attr("y1", function(d) { return y(d.charges_avg); })
-				.attr("x2",function(d){return x(d.DRG) +x.rangeBand();})
-				.attr("y2", function(d) { return y(d.charges_avg); })
+				.attr("y1",function(d){return y(d.DRG)})
+				.attr("x1", function(d) { return x(d.charges_avg); })
+				.attr("y2",function(d){return y(d.DRG) +y.rangeBand();})
+				.attr("x2", function(d) { return x(d.charges_avg); })
 				.attr("stroke-width", 2)
-				 .attr("stroke", "#eee");
+				 .attr("stroke", "#E9E2F2");
 
 			
-		})
+		})//end of reading data for giant chart
 
 
 
-	}
+	} //end of draw giant chart
+
+	function drawAvgcht(){
+		var margin = {top: 10, right: 10, bottom: 70, left: 10},
+		    width = 200 - margin.left - margin.right,
+		    height = 300 - margin.top - margin.bottom;
+
+		var x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
+
+		var y = d3.scale.linear().range([height, 0]);
+
+		var xAxis = d3.svg.axis()
+		    .scale(x)
+		    .orient("bottom")
+
+		var yAxis = d3.svg.axis()
+		    .scale(y)
+		    .orient("left")
+		    .ticks(10);
+
+		var svg = d3.select(".avg-cht").append("svg")
+		    .attr("width", width + margin.left + margin.right)
+		    .attr("height", height + margin.top + margin.bottom)
+		  .append("g")
+		    .attr("transform", 
+		          "translate(" + margin.left + "," + margin.top + ")");
+		
+		function make_y_axis() {
+		  return d3.svg.axis()
+		      .scale(y)
+		      .orient("left")
+		      .ticks(5)
+		}
+
+		d3.tsv("data.tsv", function(error, data) {
+
+		    data.forEach(function(d) {
+		        d.value = +d.value;
+		    });
+			
+		  x.domain(data.map(function(d) { return d.letter; }));
+		  y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+		  svg.append("g")
+		      .attr("class", "x axis")
+		      .attr("transform", "translate(0," + height + ")")
+		      .call(xAxis)
+		    .selectAll("text")
+		      .style("text-anchor", "end")
+		      .attr("dx", "-.8em")
+		      .attr("dy", "-.55em")
+		      .attr("transform", "rotate(-90)" );
+
+		  svg.append("g")
+		      .attr("class", "y axis")
+		      .call(yAxis)
+		    .append("text")
+		      .attr("transform", "rotate(-90)")
+		      .attr("y", 6)
+		      .attr("dy", ".71em")
+		      .style("text-anchor", "end")
+		      .text("Value ($)");
+
+		  svg.selectAll("bar")
+		      .data(data)
+		    .enter().append("rect")
+		      .style("fill", "steelblue")
+		      .attr("x", function(d) { return x(d.letter); })
+		      .attr("width", x.rangeBand())
+		      .attr("y", function(d) { return y(d.value); })
+		      .attr("height", function(d) { return height - y(d.value); });
+
+		   svg.append("g")            
+		        .attr("class", "grid")
+		        .call(make_y_axis()
+		            .tickSize(-width, 0, 0)
+		            .tickFormat("")
+		        )
+
+		}); //end of data closure
+	}//end of drawAvgcht
 
 	function resizeChart(){
 
@@ -307,12 +409,14 @@ function Graph(){
 	return {
 		"draw": drawChart,
 		"resize":resizeChart,
+		"avgchart":drawAvgcht
 		 }
 }
 
 var graphA = Graph();
 graphA.draw();
-// window.on("resize", graphA.resize);
+graphA.avgchart();
+window.on("resize", graphA.resize);
 
 
 
