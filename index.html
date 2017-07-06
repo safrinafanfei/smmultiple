@@ -4,99 +4,391 @@
 	<title></title>
 </head>
 <style>
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  position: relative;
+/*  width: 960px;
+*/}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
 .axis path,
 .axis line {
-    fill: none;
-    stroke: #eee;
-    shape-rendering: crispEdges;
+  fill: none;
+  stroke:white;
+  shape-rendering: crispEdges;
 }
- 
-.axis text {
-    font-family: sans-serif;
-    font-size: 11px;
-}
- 
 
- 
-.circle {
-    fill: rgba(180, 89, 140,0.5);
+.bar {
+/*  fill: steelblue;
+*/  fill-opacity: .9;
 }
+
+.x.axis path {
+  display: none;
+}
+
+label {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.dot{
+	fill:white;
+/*	stroke:#EEA1CD;
+*/}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 5px;
+  color: #666;
+  border-radius: 2px;
+  font-size: 10px;
+  border:3px solid #B57900;
+  z-index:999;
+  background-color: white;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+.avg_line{
+	stroke: 3px solid black
+}
+
+#graphic {
+    position: fixed;
+    top: 0px;
+    z-index: 998;
+  }
+
+  #sections {
+    position: relative;
+    margin: 50px auto;  
+    top: 260px;
+    z-index: 90;
+    width:50%;
+  }
+
+  .section{
+    width: 280px;
+    height: 300px;
+  background-color: rgba(255,255,255,0.8)
+	margin-bottom:240px;
+  }
+
+  .step {
+      margin-bottom: 500px;
+    }
+
+    .highlight{
+    	fill:#eee !important;
+    }
+
 </style>
 <body>
-<div id="punchcard"></div>
+<div id="sections">
+    <section class="section step" id="section1">
+      <div class="chart-hed">TKTKTKTK</div>
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua. 
+    </section>
+    <section class="section step" id="section2">
+      <div class="chart-hed">TKTKTKTK</div>
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+      quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+      consequat. 
+    </section>
+    <section class="section step" id="section3">
+      <div class="chart-hed">TKTKTKTK</div>
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+      quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+      consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+      cillum dolore eu fugiat nulla pariatur. 
+     </section>
+     <section class="section step" id="section4">
+      <div class="chart-hed">TKTKTKTK</div>
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+      quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+      consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+      cillum dolore eu fugiat nulla pariatur. 
+     </section>
+     <section class="section step" id="section5">
+      <div class="chart-hed">TKTKTKTK</div>
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+      quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+      consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+      cillum dolore eu fugiat nulla pariatur. 
+     </section>
+</div>
+<div id="graphic"></div>
+
 </body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="https://d3js.org/d3-time.v1.min.js"></script>
-<script src="https://d3js.org/d3-time-format.v2.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script src="fisheye.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
 <script>
-var w = 300, h = 400, pad = 50, left_pad = 20, data_url = '/data.json'
-var svg = d3.select('#punchcard')
-		.append('svg')
-		.attr('width', w)
-		.attr('height',h);
+function Graph(){
+	function drawChart(){
+		var margin = {top: 20, right:20, bottom:30, left:80},
+		width = window.innerWidth *0.9,
+		height = window.innerHeight * 0.9;
+
+	var z = d3.fisheye.ordinal().rangeRoundBands([0, width - margin.right - margin.left]).distortion(0.9);
 
 
-d3.csv('usdatatest-xlsx.csv', function (error, data){
+	var color = d3.scale.ordinal()
+		.range(["#A66F00", "#D78F00","#FFAA00","#FFBB33","#FFD685"])
 
-var parseDate = d3.time.format("%Y").parse;
+	var x = d3.scale.ordinal()
+		.rangeRoundBands([0,width],.1,1);
 
-var formatDate = d3.time.format("%y");
+	var y = d3.scale.linear()
+		.range([height,0]);
 
-	data.forEach(function(d){
-		d.type = d.type;
-		d.a = d.a; 
-		d.b = + d.b;
-		// console.log(formatDate(d.a));	
+	var xAxis = d3.svg.axis()
+		.scale(x)
+		.orient("top");
+
+	var yAxis = d3.svg.axis()
+		.scale(y)
+		.orient("left")
+		.innerTickSize(-width)
+	    .outerTickSize(0)
+	    .tickPadding(10);
+
+	var svg = d3.select("#graphic").append("svg")
+		.attr("width",width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+		.append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	
+
+	d3.csv("data.csv", function(error, data){
+
+		data.forEach(function(d){
+			d.charges_max = +d.charges_max;
+			d.charges_min = +d.charges_min;
+			d.charges_avg = +d.charges_avg;
+		})
+
+		x.domain(data.sort(function(a,b){return d3.descending(a.charges_max, b.charges_max);}).map(function(d){return d.DRG;}))
+		y.domain([0, d3.max(data, function(d){return d.charges_max;})])
+
+		svg.append("g")
+			.attr("class","x axis")
+			.attr("transform", "translate(0," + height + ")")
+			.call(xAxis)
+			.selectAll("text")
+		    .attr("y", 0)
+		    .attr("x", 9)
+		    .attr("dy", ".35em")
+		    .attr("transform", "rotate(90)")
+		    .style("text-anchor", "start");
+
+		svg.append("g")
+			.attr("class","y axis")
+			.call(yAxis)
+			.append("text")
+		      .attr("transform", "rotate(-90)")
+		      .attr("y", 6)
+		      .attr("dy", ".71em")
+		      .style("text-anchor", "end")
+		      .text("charges");
+
+		var tip = d3.tip()
+		.attr('class',"d3-tip")
+		.offset([-10,0])
+		.html(function(d){
+			return d.DRG + '</br>' + 'Largest amount hospital billed Medicare:' + d.charges_max + '</br>' + "Smallest amount hospital billed Medicare:" + d.charges_min
+
+		})
+
+		svg.call(tip)
+
+		var bars = svg.selectAll(".bar")
+	      .data(data)
+	    .enter().append("rect")
+	      .attr("class", "bar")
+	      .attr("x", function(d) { return x(d.DRG); })
+	      .attr("width", x.rangeBand())
+	      .attr("y", height)
+	      .attr("height",0)
+
+	      bars.transition()
+	      .delay(function(d,i){return i *7})
+	      .attr("y", function(d) { return y(d.charges_max); })
+	      .attr("height", function(d) { return  height - y(d.charges_max - d.charges_min)})
+	      .style("fill", function(d,i){
+	      	      	if(d.charges_max/d.charges_min >=20){
+	      	      		return color(0);
+	      	      	}else if (d.charges_max/d.charges_min >=10 && d.charges_max/d.charges_min <20){
+	      	      		return color(1);
+	      	      	} else if (d.charges_max/d.charges_min<10 && d.charges_max/d.charges_min >5){
+	      	      		return color(2);
+	      	      	}else if (d.charges_max/d.charges_min <= 5 && d.charges_max/d.charges_min >3){
+	      	      		return color(3)
+	      	      	}else{
+	      	      		return color(4)
+	      	      	}
+	      })
+
+	      bars.on("mouseover",function(d,i){
+	      	tip.show(d,i);
+	      	// $(this).css("fill","#eee")
+	      	$(this).addClass("highlight");
+	      })
+	      	.on("mouseout",function(d,i){
+	      		tip.hide(d,i)
+	      		$(this).removeClass("highlight")
+	      	})
+
+
+
+
+
+	  //     svg.selectAll("circle.max")
+	  //     	.data(data)
+	  //     	.enter().append("circle")
+	  //     	.attr("class","dot")
+	  //     	.attr("cx", function(d){return x(d.DRG) +x.rangeBand()/2;})
+	  //     	.attr("cy", height)
+	  //     	.attr("stroke",function(d,i){
+	  //     	      	if(d.charges_max/d.charges_min >=20){
+	  //     	      		return color(0);
+	  //     	      	}else if (d.charges_max/d.charges_min >=10 && d.charges_max/d.charges_min <20){
+	  //     	      		return color(1);
+	  //     	      	} else if (d.charges_max/d.charges_min<10 && d.charges_max/d.charges_min >5){
+	  //     	      		return color(2);
+	  //     	      	}else if (d.charges_max/d.charges_min <= 5 && d.charges_max/d.charges_min >3){
+	  //     	      		return color(3)
+	  //     	      	}else{
+	  //     	      		return color(4)
+	  //     	      	}
+	  //     	      })
+	  //     	.transition()
+	  //     .delay(function(d,i){return i *70})
+	  //     	.attr("cy", function(d) { return y(d.charges_max); })
+	  //     	.attr("r", x.rangeBand()/2 )
+			// .style("fill", "white")
+
+			
+
+		// svg.selectAll("circle.avg")
+	 //      	.data(data)
+	 //      	.enter().append("circle")
+	 //      	.attr("class","dot")
+	 //      	.attr("cx", function(d){return x(d.DRG) + x.rangeBand()/2 ;})
+	 //      	.attr("cy", height)
+	 //      	.attr("stroke","white")
+	 //      	.transition()
+	 //      .delay(function(d,i){return i *70})
+	 //      .attr("cy", function(d) { return y(d.charges_avg); })
+	 //      	.attr("r", x.rangeBand()/2 -1 )
+		// 	.style("fill", "white")
+			
+	svg.selectAll("line_avg")
+		.data(data)
+		.enter().append("line")
+		.attr("class","avg_line")
+		.attr("x1",function(d){return x(d.DRG)})
+		.attr("y1", height)
+		.attr("x2",function(d){return x(d.DRG) +x.rangeBand();})
+		.attr("y2", height)
+		.transition()
+	    .delay(function(d,i){return i *7})
+		.attr("x1",function(d){return x(d.DRG)})
+		.attr("y1", function(d) { return y(d.charges_avg); })
+		.attr("x2",function(d){return x(d.DRG) +x.rangeBand();})
+		.attr("y2", function(d) { return y(d.charges_avg); })
+		.attr("stroke-width", 2)
+		 .attr("stroke", "#eee");
+
+
+
+		// svg.selectAll("circle.min")
+	 //      	.data(data)
+	 //      	.enter().append("circle")
+	 //      	.attr("class","dot")
+	 //      	.attr("cx", function(d){return x(d.DRG) +x.rangeBand()/2 ;})
+	 //      	.attr("cy", height)
+	 //      	.attr("stroke",function(d,i){
+	 //      	      	if(d.charges_max/d.charges_min >=20){
+	 //      	      		return color(0);
+	 //      	      	}else if (d.charges_max/d.charges_min >=10 && d.charges_max/d.charges_min <20){
+	 //      	      		return color(1);
+	 //      	      	} else if (d.charges_max/d.charges_min<10 && d.charges_max/d.charges_min >5){
+	 //      	      		return color(2);
+	 //      	      	}else if (d.charges_max/d.charges_min <= 5 && d.charges_max/d.charges_min >3){
+	 //      	      		return color(3)
+	 //      	      	}else{
+	 //      	      		return color(4)
+	 //      	      	}
+	 //      	      })
+	 //      	.transition()
+	 //      .delay(function(d,i){return i *70})
+	 //      	.attr("cy", function(d) { return y(d.charges_min); })
+	 //      	.attr("r", x.rangeBand()/2  )
+		// 	.style("fill", "white")
+			
+
+
+
+
 	})
 
-	var yearFilter = function(d,i){
-		return !(i%2)
+
+
 	}
-	// console.log(function(d){return d.type});
-	var x = d3.scale.ordinal().domain(data.map(function(d){return d.a;})).rangePoints([left_pad, w-pad]),
-	y = d3.scale.ordinal().domain(data.map(function(d){return d.type;})).rangePoints([pad, h-pad*2]);
+
+	function resizeChart(){
+
+	}
+
+	return {
+		"draw": drawChart,
+		"resize":resizeChart,
+		 }
+}
+
+var graphA = Graph();
+graphA.draw();
+window.on("resize", graphA.resize);
+
 
 
 	
 
-	var xAxis = d3.svg.axis().scale(x).orient("top")
-			.tickValues(x.domain().filter(function(d,i){return !(i%4);}));
 
-        
-
-	yAxis = d3.svg.axis().scale(y).orient("right")
-		.ticks(7);
-        
-
-    svg.append("g")
-    .attr("class", "axis")
-    .attr("transform", "translate(0, "+(pad)+")")
-    .call(xAxis);
- 
-	svg.append("g")
-	    .attr("class", "axis")
-	    .attr("transform", "translate("+(w-pad)+", 0)")
-	    .call(yAxis);
-
-	var max_r = d3.max(data.map(function(d){return d.b;})),
-
-	r = d3.scale.linear()
-		.domain([0, max_r])
-		.range([0,8]);
-
-	svg.selectAll("circle")
-		.data(data)
-		.enter()
-		.append("circle")
-		.attr("class","circle")
-		.attr("cx", function(d){return x(d.a);})
-		.attr("cy", function(d){return y(d.type);})
-		.attr("r",function(d){return r(d.b);});
-
-
-
-
-})
+	
 
 
 
