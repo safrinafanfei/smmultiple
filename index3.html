@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+<title></title>
+<link rel="stylesheet" type="text/css" href="chosen.css">
 </head>
 <style>
 body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "roboto", Helvetica, Arial, sans-serif;
   position: relative;
 /*  width: 960px;
 */}
@@ -41,37 +44,6 @@ label {
 /*	stroke:#EEA1CD;
 */}
 
-.d3-tip {
-  line-height: 1;
-  font-weight: bold;
-  padding: 5px;
-  color: #666;
-  border-radius: 2px;
-  font-size: 10px;
-  border:3px solid #B57900;
-  z-index:999;
-  background-color: white;
-}
-
-/* Creates a small triangle extender for the tooltip */
-.d3-tip:after {
-  box-sizing: border-box;
-  display: inline;
-  font-size: 10px;
-  width: 100%;
-  line-height: 1;
-  color: rgba(0, 0, 0, 0.8);
-  content: "\25BC";
-  position: absolute;
-  text-align: center;
-}
-
-/* Style northward tooltips differently */
-.d3-tip.n:after {
-  margin: -1px 0 0 0;
-  top: 100%;
-  left: 0;
-}
 
 .avg_line{
 	stroke: 3px solid black
@@ -133,8 +105,135 @@ label {
 	    stroke-width: 0;
 	}
 
+	.gradient_top{
+		background-color: white;
+	    height: 100px;
+	    position: fixed;
+	    top: 0px;
+	    width: 100%;
+	    z-index: 91;
+	    box-shadow: 0em 2em 3em #fff;
+
+	}
+
+	.lg{
+		float:left;
+		width:40px;
+		height:10px;
+		margin-right:10px;
+	}
+
+	.lg-col-1{
+		background-color: #FFD685;
+	}
+
+	.lg-col-2{
+		background-color: #FFBB33;
+	}
+
+	.lg-col-3{
+		background-color: #FFAA00;
+	}
+
+	.lg-col-4{
+		background-color: #D78F00;
+	}
+	.lg-col-5{
+		background-color: #A66F00;
+	}
+
+	.legend{
+		margin-top: 10px;
+	}
+	.cf{
+		clear:both;
+	}
+
+	.lg-text{
+		font-size:8px;
+	}
+
+	.chosen-container-single .chosen-single {
+	    position: relative;
+	    display: block;
+	    overflow: hidden;
+	    padding: 4px 0 0 20px;
+	    height: 32px;
+	    border-bottom: 2px solid #5696E9;
+	    border-top: 0px solid #5696E9;
+	    border-left: 0px solid #5696E9;
+	    border-right: 0px solid #5696E9;
+
+	    /* border-top: 2px solid #5696E9; */
+	    border-radius: 2px;
+	    text-decoration: none;
+	    white-space: nowrap;
+	    line-height: 24px;
+	     background: rgba(0,0,0,.02); 
+	    color: #444;
+	}
+
+	.dropdown{
+		margin-top: 20px;
+		max-width: 300px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.sb_hed{
+		color:grey;
+		font-size: 10px;
+	}
+
+	.tb_hed{
+		color:#666;
+		font-size:14px;
+	}
+
+	.nb{
+		font-size: 12px;
+	}
+
+	.tb{
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+
+	table{
+		border-collapse: collapse;
+
+	}
+	table, th, td {
+   		border-bottom: 1px solid #ddd;
+   		padding:4px;
+	}
+
+	.tb-an{
+		margin-top: 20px;
+		font-size: 14px;
+		font-weight: bold;
+	}
+
+	.fl-ex{
+		color:#AA3939;
+		font-size: 20px;
+	}
+
+	.fl-chp{
+		color:#226666;
+		font-size: 20px;
+	}
+
+	.source{
+		font-size: 10px;
+		font-style: oblique;
+	}
+
+
+
 </style>
 <body>
+<div class="gradient_top"></div>
 <div id="sections">
     <section class="section step" id="section1">
       <h1>How much do hospitals charge?</h1>
@@ -148,7 +247,7 @@ label {
     <section class="section step" id="section2">
       <div class="chart-hed">TKTKTKTK</div>
       On average, the most expensive hospital charges <span class="tx_highlight">3 times </span> more than an average hospital on a single procedure. 
-      While you can save more than <span class="tx_highlight">12 times</span> if you are treated in the least costly hospital. 
+      While you can save more than <span class="tx_highlight">12 times</span>of your money if you are treated in the least costly hospital. 
       <div class="avg-cht"></div>
     </section>
     <section class="section step" id="section3">
@@ -158,6 +257,9 @@ label {
       quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
       consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
       cillum dolore eu fugiat nulla pariatur. 
+      <div class="legend"><span class="lg lg-col-1"> </span><span class="lg lg-col-2"></span><span class="lg lg-col-3"></span><span class="lg lg-col-4"></span><span class="lg lg-col-5"></span></div>
+      <div class="cf"></div>
+      <div class="lg-text"><span class="lg lg-text">more than 20 times</span><span class="lg lg-text"> 10 to 20 times</span><span class="lg lg-text">5 to 10 times</span><span class="lg lg-text">3 to 5 times</span><span class="lg lg-text">less than 3 times</span></div>
      </section>
      <section class="section step" id="section4">
       <div class="chart-hed">TKTKTKTK</div>
@@ -168,14 +270,51 @@ label {
       cillum dolore eu fugiat nulla pariatur. 
      </section>
      <section class="section step" id="section5">
-      <div class="chart-hed">TKTKTKTK</div>
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-      quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-      consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-      cillum dolore eu fugiat nulla pariatur. 
-     </section>
+      <div class="chart-hed">Explore yourself</div>
+      Hover over or search for a procedure
+	    <div class="dropdown occupation">
+			<div style="text-align:left; font-weight:bold; margin-bottom:10px;">If you need a  </div>
+		    <select class="chosen occ-name" data-placeholder="Choose an occupation"><option value=""></option></select>
+		</div>
+	    <table class="tb tp-tb">
+	    <div class="tb-an">
+		    <div>Most expensive hospital: <span class="fl-ex"></span></div>
+		    <div>Number of cases:<span class="fl-ex-cs"></span></div>
+		</div>
+	    <tr>
+	    	<th class="tb_hed" colspan="2">Avg. amount hospital billed Medicare</th><th class="tb_hed" colspan="2">Avg. amount paid by Medicare</th>
+	    </tr>
+	    <tr>
+	    	<td class="sb_hed">AMOUNT</td><td class="sb_hed">VS. U.S. AVG.</td>
+	    	<td class="sb_hed">AMOUNT</td><td class="sb_hed">VS. U.S. AVG.</td>
+	    </tr>
+	    <tr>
+	    	<td class="nb fl-ex-money">??</td><td class="nb fl-ex-money-avg">??</td>
+	    	<td class="nb fl-ex-pay">??</td><td class="nb fl-ex-pay-avg">??</td>
+
+	    </tr>
+	    </table>
+	    <table class="tb lw-tb">
+	    <div class="tb-an">
+		    <div>Cheapest hospital: <span class="fl-chp"></span></div>
+		    <div>Number of cases:<span class="fl-chp-cs"></span></div>
+	    </div>
+	    <tr>
+	    	<th class="tb_hed" colspan="2">Avg. amount hospital billed Medicare</th><th class="tb_hed" colspan="2">Avg. amount paid by Medicare</th>
+	    </tr>
+	    <tr>
+	    	<td class="sb_hed">AMOUNT</td><td class="sb_hed">VS. U.S. AVG.</td>
+	    	<td class="sb_hed">AMOUNT</td><td class="sb_hed">VS. U.S. AVG.</td>
+	    </tr>
+	    <tr>
+	    	<td class="nb fl-chp-money">??</td><td class="nb fl-chp-money-avg">??</td>
+	    	<td class="nb fl-chp-pay">??</td><td class="nb fl-chp-pay-avg">??</td>
+	    </tr>
+	    </table>
+	    <div class="source">Source: Modern Healthcare analysis of CMS data</div>
+	    </section>
 </div>
+
 <div id="graphic"></div>
 
 </body>
@@ -183,13 +322,15 @@ label {
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script src="fisheye.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/noframework.waypoints.min.js"></script>
+<script src="chosen.min.js"></script>
+<script src="chosen.mobile.min.js"></script>
 <script>
-function Graph(){
-	function drawChart(){
-		var margin = {top: 10, right:20, bottom:30, left:0},
+function Graph(top){
+
+		var margin = {top: 10, right:20, bottom:30, left:10},
 		width = window.innerWidth *0.9,
-		height = window.innerHeight;
+		height = window.innerHeight ;
 
 		var z = d3.fisheye.ordinal().rangeRoundBands([0, width - margin.right - margin.left]).distortion(0.9);
 
@@ -201,7 +342,7 @@ function Graph(){
 			.range([0,width]);
 
 		var y = d3.scale.ordinal()
-			.rangeRoundBands([height, 0], .1)
+			.rangeBands([height, 0], .1,3)
 
 		var xAxis = d3.svg.axis()
 			.scale(x)
@@ -214,27 +355,36 @@ function Graph(){
 		    .tickPadding(1);
 
 		var svg = d3.select("#graphic").append("svg")
+			.attr("class","giant_chart")
 			.attr("width",width + margin.left + margin.right)
 			.attr("height", height + margin.top + margin.bottom)
 			.append("g")
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	
-
+		function drawChart(){
 		d3.csv("data.csv", function(error, data){
 
 			data.forEach(function(d){
 				d.charges_max = +d.charges_max;
 				d.charges_min = +d.charges_min;
 				d.charges_avg = +d.charges_avg;
+				d.medipay_max = +d.medipay_max;
+				d.medipay_min = +d.medipay_min;
+				d.medipay_avg = +d.medipay_avg;
 			})
 
-			y.domain(data.sort(function(a,b){return d3.ascending(a.charges_max, b.charges_max);}).map(function(d){return d.DRG;}))
-			x.domain([0, d3.max(data, function(d){return d.charges_max;})])
+			y.domain(data.sort(function(a,b){if(top){
+				return d3.ascending(a.charges_max, b.charges_max)
+			}else{
+				return d3.ascending(a.medipay_max, b.medipay_max)
+			}}).map(function(d){return d.DRG;}))
+
+			x.domain([0, d3.max(data, function(d){if(top){return d.charges_max;}else{return d.medipay_max;}})])
 
 			svg.append("g")
 				.attr("class","x axis")
-				// .attr("transform", "translate(0," + height + ")")
+				.attr("transform", function(){if(top){return "translate(0," + height + ")"}else{return "translate(0,0)"}})
 				.call(xAxis)
 				.selectAll("text")
 			    .attr("y", 0)
@@ -252,15 +402,7 @@ function Graph(){
 			      .attr("dy", ".71em")
 			      .style("text-anchor", "end")
 
-			var tip = d3.tip()
-			.attr('class',"d3-tip")
-			.offset([-10,0])
-			.html(function(d){
-				return d.DRG + '</br>' + 'Largest amount hospital billed Medicare:' + d.charges_max + '</br>' + "Smallest amount hospital billed Medicare:" + d.charges_min
 
-			})
-
-			svg.call(tip)
 
 			var bars = svg.selectAll(".bar")
 		      .data(data)
@@ -268,9 +410,60 @@ function Graph(){
 		      .attr("class", "bar")
 		      .attr("y", function(d) { return y(d.DRG); })
 		      .attr("height", y.rangeBand())
-		      .attr("x", function(d) { return x(d.charges_min); })
-		      .attr("width", function(d) { return  x(d.charges_max-d.charges_min)})
-		      .style("fill", function(d,i){
+		      .attr("x", function(d) { if(top){return x(d.charges_min)}else{return x(d.medipay_min)} })
+		      .attr("width", function(d) { if(top){return x(d.charges_max - d.charges_min)}else{return x(d.medipay_max-d.medipay_min)}})
+		      // .style("fill", function(d,i){
+		      // 	      	if(d.charges_max/d.charges_min >=20){
+		      // 	      		return color(0);
+		      // 	      	}else if (d.charges_max/d.charges_min >=10 && d.charges_max/d.charges_min <20){
+		      // 	      		return color(1);
+		      // 	      	} else if (d.charges_max/d.charges_min<10 && d.charges_max/d.charges_min >5){
+		      // 	      		return color(2);
+		      // 	      	}else if (d.charges_max/d.charges_min <= 5 && d.charges_max/d.charges_min >3){
+		      // 	      		return color(3)
+		      // 	      	}else{
+		      // 	      		return color(4)
+		      // 	      	}
+		      // 		})
+		      .style("fill","lightgrey")
+		      // .style("filter", "url(#drop-shadow)")
+
+		      bars.on("mouseover",function(d,i){
+			      	// $(this).css("fill","#eee")
+			      	$(this).addClass("highlight");
+			      	$(".fl-ex").html("</br>" + d.provider_name_max + ", " + d.provider_state_max)
+			      	$(".fl-ex-cs").html(d.discharges_max)
+			      	$(".fl-chp").html("</br>" + d.provider_name_min + ", " + d.provider_state_min)
+			      	$(".fl-chp-cs").html(d.discharges_min)
+			      	$(".fl-ex-money").html("$" +numberWithCommas(d.charges_max))
+			      	$(".fl-ex-money-avg").html(parseFloat(Math.round(d.charges_max/d.charges_avg * 100) / 100).toFixed(2)+ "x")
+			      	$(".fl-chp-money").html("$" +numberWithCommas(d.charges_min))
+			      	$(".fl-chp-money-avg").html(parseFloat(Math.round(d.charges_min/d.charges_avg * 100) / 100).toFixed(2) + "x")
+			      	$(".fl-ex-pay").html("$" +numberWithCommas(d.medipay_max))
+			      	$(".fl-ex-pay-avg").html(parseFloat(Math.round(d.medipay_max/d.medipay_avg * 100) / 100).toFixed(2) + "x")
+			      	$(".fl-chp-pay").html("$" +numberWithCommas(d.medipay_min))
+			      	$(".fl-chp-pay-avg").html(parseFloat(Math.round(d.medipay_min/d.medipay_avg * 100) / 100).toFixed(2)  + "x")
+		      	})
+		      	.on("mouseout",function(d,i){
+		      		$(this).removeClass("highlight")
+		      	})
+
+			
+		})//end of reading data for giant chart
+	} //end of draw giant chart
+
+	function paintCht(){
+		d3.csv("data.csv", function(error, data){
+			
+			data.forEach(function(d){
+				d.charges_max = +d.charges_max;
+				d.charges_min = +d.charges_min;
+				d.charges_avg = +d.charges_avg;
+			})
+			d3.selectAll(".bar")
+				.transition()
+		      .delay(function(d,i){return i *7})
+				.style("fill", function(d,i){
 		      	      	if(d.charges_max/d.charges_min >=20){
 		      	      		return color(0);
 		      	      	}else if (d.charges_max/d.charges_min >=10 && d.charges_max/d.charges_min <20){
@@ -283,46 +476,44 @@ function Graph(){
 		      	      		return color(4)
 		      	      	}
 		      		})
-		      
-		      // .style("filter", "url(#drop-shadow)")
+	})
+	}
 
-		      bars.on("mouseover",function(d,i){
-			      	tip.show(d,i);
-			      	// $(this).css("fill","#eee")
-			      	$(this).addClass("highlight");
-		      	})
-		      	.on("mouseout",function(d,i){
-		      		tip.hide(d,i)
-		      		$(this).removeClass("highlight")
-		      	})
+	function drawAvgline(){
 
-
- 			//draw Average lines	
-			svg.selectAll("line_avg")
-				.data(data)
-				.enter().append("line")
-				.attr("class","avg_line")
-				.attr("y1",function(d){return y(d.DRG)})
-				.attr("x1", 0)
-				.attr("y2",function(d){return y(d.DRG) +y.rangeBand();})
-				.attr("x2", 0)
-				.transition()
-			    .delay(function(d,i){return i *7})
-				.attr("y1",function(d){return y(d.DRG)})
-				.attr("x1", function(d) { return x(d.charges_avg); })
-				.attr("y2",function(d){return y(d.DRG) +y.rangeBand();})
-				.attr("x2", function(d) { return x(d.charges_avg); })
-				.attr("stroke-width", 2)
-				 .attr("stroke", "#E9E2F2");
-
+		d3.csv("data.csv", function(error, data){
 			
-		})//end of reading data for giant chart
+			data.forEach(function(d){
+				d.charges_max = +d.charges_max;
+				d.charges_min = +d.charges_min;
+				d.charges_avg = +d.charges_avg;
+			})
+
+
+			svg.selectAll("line_avg")
+					.data(data)
+					.enter().append("line")
+					.attr("class","avg_line")
+					.attr("y1",function(d){return y(d.DRG)})
+					.attr("x1", 0)
+					.attr("y2",function(d){return y(d.DRG) +y.rangeBand();})
+					.attr("x2", 0)
+					.transition()
+				    .delay(function(d,i){return i *7})
+					.attr("y1",function(d){return y(d.DRG)})
+					.attr("x1", function(d) { return x(d.charges_avg); })
+					.attr("y2",function(d){return y(d.DRG) +y.rangeBand();})
+					.attr("x2", function(d) { return x(d.charges_avg); })
+					.attr("stroke-width", 3)
+					.attr("stroke", "#073596");
+			})
+	}
 
 
 
-	} //end of draw giant chart
 
 	function drawAvgcht(){
+
 		var margin = {top: 10, right: 10, bottom: 70, left: 10},
 		    width = 200 - margin.left - margin.right,
 		    height = 300 - margin.top - margin.bottom;
@@ -409,24 +600,64 @@ function Graph(){
 	return {
 		"draw": drawChart,
 		"resize":resizeChart,
-		"avgchart":drawAvgcht
+		"avgchart":drawAvgcht,
+		"avgline":drawAvgline,
+		"paintcht":paintCht,
 		 }
 }
 
-var graphA = Graph();
+var graphA = Graph(true);
 graphA.draw();
 graphA.avgchart();
-window.on("resize", graphA.resize);
+
+// window.on("resize", graphA.resize);
 
 
+
+var waypoint = new Waypoint({
+  element: document.getElementById('section2'),
+  handler: function(direction) {
+  	if(direction == "down"){
+    		graphA.avgline();
+          }else{
+            d3.select(".giant_chart").selectAll(".avg_line").remove()
+
+          }
+  },
+  offset:'50%'
+})	
+
+var waypoint2 = new Waypoint({
+  element: document.getElementById('section3'),
+  handler: function(direction) {
+  	if(direction == "down"){
+			graphA.paintcht();
+          }else{
+            d3.selectAll(".bar").style("fill","lightgrey")
+          }
+  },
+  offset:'50%'
+
+})
 
 	
+d3.csv("data.csv", function(error, data){
+	for (var i = 0; i < data.length; i++){
+		$('.occ-name').append('<option value=' + data[i].ID+ ' >' + data[i].DRG + '</option>');
+		console.log(data[i].DRG);
+	}
+})
+
+$(".chosen").chosen({
+    width: "100%",
+    allow_single_deselect: true
+});
 
 
-	
+$(".chosen").trigger("chosen:updated");
 
-
-
-
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 </script>
 </html>
