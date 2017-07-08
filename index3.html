@@ -326,7 +326,25 @@ label {
 <script src="chosen.min.js"></script>
 <script src="chosen.mobile.min.js"></script>
 <script>
-function Graph(top){
+function Graph(){
+		var myData;
+
+		d3.csv("data.csv", function(error, data){
+
+			data.forEach(function(d){
+				d.charges_max = +d.charges_max;
+				d.charges_min = +d.charges_min;
+				d.charges_avg = +d.charges_avg;
+				d.medipay_max = +d.medipay_max;
+				d.medipay_min = +d.medipay_min;
+				d.medipay_avg = +d.medipay_avg;
+			});
+
+			myData = data;
+
+			drawChart();
+
+		})
 
 		var margin = {top: 10, right:20, bottom:30, left:10},
 		width = window.innerWidth *0.9,
@@ -363,28 +381,17 @@ function Graph(top){
 
 	
 		function drawChart(){
-		d3.csv("data.csv", function(error, data){
+		
 
-			data.forEach(function(d){
-				d.charges_max = +d.charges_max;
-				d.charges_min = +d.charges_min;
-				d.charges_avg = +d.charges_avg;
-				d.medipay_max = +d.medipay_max;
-				d.medipay_min = +d.medipay_min;
-				d.medipay_avg = +d.medipay_avg;
-			})
-
-			y.domain(data.sort(function(a,b){if(top){
+			y.domain(myData.sort(function(a,b){
 				return d3.ascending(a.charges_max, b.charges_max)
-			}else{
-				return d3.ascending(a.medipay_max, b.medipay_max)
-			}}).map(function(d){return d.DRG;}))
+			}).map(function(d){return d.DRG;}))
 
-			x.domain([0, d3.max(data, function(d){if(top){return d.charges_max;}else{return d.medipay_max;}})])
+			x.domain([0, d3.max(myData, function(d){return d.charges_max;})])
 
 			svg.append("g")
 				.attr("class","x axis")
-				.attr("transform", function(){if(top){return "translate(0," + height + ")"}else{return "translate(0,0)"}})
+				.attr("transform", function(){return "translate(0," + height + ")"})
 				.call(xAxis)
 				.selectAll("text")
 			    .attr("y", 0)
@@ -405,13 +412,13 @@ function Graph(top){
 
 
 			var bars = svg.selectAll(".bar")
-		      .data(data)
+		      .data(myData)
 		    .enter().append("rect")
 		      .attr("class", "bar")
 		      .attr("y", function(d) { return y(d.DRG); })
 		      .attr("height", y.rangeBand())
-		      .attr("x", function(d) { if(top){return x(d.charges_min)}else{return x(d.medipay_min)} })
-		      .attr("width", function(d) { if(top){return x(d.charges_max - d.charges_min)}else{return x(d.medipay_max-d.medipay_min)}})
+		      .attr("x", function(d) {return x(d.charges_min)})
+		      .attr("width", function(d) {return x(d.charges_max - d.charges_min)})
 		      // .style("fill", function(d,i){
 		      // 	      	if(d.charges_max/d.charges_min >=20){
 		      // 	      		return color(0);
@@ -449,17 +456,10 @@ function Graph(top){
 		      	})
 
 			
-		})//end of reading data for giant chart
 	} //end of draw giant chart
 
 	function paintCht(){
-		d3.csv("data.csv", function(error, data){
 			
-			data.forEach(function(d){
-				d.charges_max = +d.charges_max;
-				d.charges_min = +d.charges_min;
-				d.charges_avg = +d.charges_avg;
-			})
 			d3.selectAll(".bar")
 				.transition()
 		      .delay(function(d,i){return i *7})
@@ -476,22 +476,11 @@ function Graph(top){
 		      	      		return color(4)
 		      	      	}
 		      		})
-	})
 	}
 
 	function drawAvgline(){
-
-		d3.csv("data.csv", function(error, data){
-			
-			data.forEach(function(d){
-				d.charges_max = +d.charges_max;
-				d.charges_min = +d.charges_min;
-				d.charges_avg = +d.charges_avg;
-			})
-
-
 			svg.selectAll("line_avg")
-					.data(data)
+					.data(myData)
 					.enter().append("line")
 					.attr("class","avg_line")
 					.attr("y1",function(d){return y(d.DRG)})
@@ -506,7 +495,6 @@ function Graph(top){
 					.attr("x2", function(d) { return x(d.charges_avg); })
 					.attr("stroke-width", 3)
 					.attr("stroke", "#073596");
-			})
 	}
 
 
@@ -607,7 +595,6 @@ function Graph(top){
 }
 
 var graphA = Graph(true);
-graphA.draw();
 graphA.avgchart();
 
 // window.on("resize", graphA.resize);
